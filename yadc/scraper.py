@@ -10,9 +10,8 @@ from pydantic import BaseModel
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 
-from .browser import Browser, BrowserError
+from .browser import Browser
 from .humanlike import randsleep, spinner_sleep
-from .utils import solve_captcha
 
 
 class Test(BaseModel):
@@ -89,22 +88,6 @@ class Scraper:
         short_notice: bool = True,
         error_period: int = 30,
     ):
-        self._browser = browser
-        self.notify = notify or print
-        i = max(self.instances) + 1 if self.instances else 1
-        self.instances.append(i)
-        self.name = f"Browser-{i}"
-        self._logger = getLogger(self.name)
-        self.drivers = drivers
-        for driver in self.drivers:
-            driver.refresh_urls = {}
-        self._logged_in = False
-        self.reserve = reserve
-        self.short_notice = short_notice
-        self.period = 5
-        self.error_period = error_period
-        self._search_counter = 0
-        self.running = True
         """A Scraper which finds tests for us.
 
         Args:
@@ -122,6 +105,22 @@ class Scraper:
 
             error_period (int): time in seconds to sleep when we have an error (default=30).
         """
+        self._browser = browser
+        self.notify = notify or print
+        i = max(self.instances) + 1 if self.instances else 1
+        self.instances.append(i)
+        self.name = f"Browser-{i}"
+        self._logger = getLogger(self.name)
+        self.drivers = drivers
+        for driver in self.drivers:
+            driver.refresh_urls = {}
+        self._logged_in = False
+        self.reserve = reserve
+        self.short_notice = short_notice
+        self.period = 5
+        self.error_period = error_period
+        self._search_counter = 0
+        self.running = True
 
     def dvsa_disabled(self):
         return datetime.now() < datetime.combine(
